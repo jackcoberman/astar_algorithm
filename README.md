@@ -1,2 +1,2 @@
-# astar_algorithm
+# astar-algorithm
 A* Search Algorithm
