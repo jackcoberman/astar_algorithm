@@ -11,6 +11,7 @@
 #include <set>
 #include <tuple>
 #include <queue>
+#include <math.h>
 
 class Grid {
  public:
@@ -86,6 +87,15 @@ bool isUnblocked(Grid grid, const Pair& point) {
   return grid.grid[point.first][point.second] == '1';
 }
 
+double calculateHValue(Grid grid, const Pair& src) {
+  // h is estimated with the two points distance formula
+  // temp: dest is bottom right
+  Pair dest(grid.getRowSize() - 1, grid.getColSize() - 1);
+  // h is calculated using euclidean distance
+  return sqrt(pow((src.first - dest.first), 2.0)
+              + pow((src.second - dest.second), 2.0));
+}
+
 void aSearchAlgorithm(Grid grid) {
   // 1) Initialize Open List
   // 2) Initialize the Closed List. Put the starting node
@@ -128,36 +138,44 @@ void aSearchAlgorithm(Grid grid) {
     for (int x = -1; x <= 1; ++x) {
       for (int y = -1; y <= 1; ++y) {
         Pair neighbor(r + x, c + y);
-	std::cout << "uwu" << std::endl;
 	// Only process neighboring cell if it's valid
 	if (isValid(grid, neighbor)) {
 	  std::cout << "(" << x << "," << y << ") is Valid" << std::endl;
-	  // TO-DO: if the dest cell is same as current successor
+	  // TO-DO: i) if the dest cell is same as current successor
 	  if (neighbor.first == grid.getRowSize() - 1 &&
               neighbor.second == grid.getColSize() - 1) {
-	    std::cout << "Ayooo cell reached" << std::endl;
+	    std::cout << "Destination cell reached" << std::endl;
 	    return;
+	  // ii) else, compute both g and h for successor
+	  // successor.g = q.g + distance between successor and q
+	  // successor.f = successor.g + successor.h
 	  } else if (!closedList[neighbor.first][neighbor.second] &&
                      isUnblocked(grid, neighbor)) {
-	    std::cout << "this dude supah unblocked" << std::endl;
+	    double gNew = cellDetails[r][c].g + 1.0;
+	    double hNew = calculateHValue(grid, neighbor); // TO-DO: variable dest
+            double fNew = gNew + hNew;
+	    std::cout << "f-val: " << fNew << std::endl;
+
+	    // if cell isn't on the open list, add it and record f, g, and h
+	    // if cell is on the open list, check to see if its f > fNew
+	    // if so, new path is better. update cell's parent and costs
+	    if (cellDetails[neighbor.first][neighbor.second].f == -1 ||
+                cellDetails[neighbor.first][neighbor.second].f > fNew) {
+	      
+              openList.push(std::make_tuple(fNew,
+                            std::pair(neighbor.first,neighbor.second)));
+
+	      cellDetails[neighbor.first][neighbor.second].g = gNew;
+	      cellDetails[neighbor.first][neighbor.second].h = hNew;
+	      cellDetails[neighbor.first][neighbor.second].f = fNew;
+	      cellDetails[neighbor.first][neighbor.second].parent = {x, y};
+	    }
 	  }
 	}
       }
     }
-    // d) for each successor
-    // i) if successor is the goal, stop search,
-    // ii) else, compute both g and h for successor
-    // successor.g = q.g + distance between successor and q (using Manhatten distance)
-    // successor.f = successor.g + successor.h
-    // iii) if a node with the same position as successor is in 
-    // the OPEN list which has a lower f than successor, skip this successor
-    // iv) if a node with the same position as successor is in the CLOSED
-    // list which has a lower f than successor, skip this
-    // successor otherwise, add the node to the open list
-    // end (for loop)
-    // e) push q on the closed list
-    // end (while loop)
   }
+  std::cout << "Failed to find the destination cell." << std::endl;
 }
 
 int main(int argc, char* argv[]) {
