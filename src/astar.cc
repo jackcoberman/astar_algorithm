@@ -96,6 +96,10 @@ double calculateHValue(Grid grid, const Pair& src) {
               + pow((src.second - dest.second), 2.0));
 }
 
+void tracePath(cell *cellDetails, int num_r, int num_c) {
+  std::cout << "ayo" << std::endl;
+}
+
 void aSearchAlgorithm(Grid grid) {
   // 1) Initialize Open List
   // 2) Initialize the Closed List. Put the starting node
@@ -145,6 +149,10 @@ void aSearchAlgorithm(Grid grid) {
 	  if (neighbor.first == grid.getRowSize() - 1 &&
               neighbor.second == grid.getColSize() - 1) {
 	    std::cout << "Destination cell reached" << std::endl;
+	    cellDetails[neighbor.first][neighbor.second].parent = { r, c };
+	    tracePath((cell *)cellDetails,
+                      grid.getRowSize(),
+		      grid.getColSize());
 	    return;
 	  // ii) else, compute both g and h for successor
 	  // successor.g = q.g + distance between successor and q
