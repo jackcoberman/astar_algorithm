@@ -12,6 +12,7 @@
 #include <tuple>
 #include <queue>
 #include <math.h>
+#include <stack>
 
 class Grid {
  public:
@@ -97,7 +98,29 @@ double calculateHValue(Grid grid, const Pair& src) {
 }
 
 void tracePath(cell *cellDetails, int num_r, int num_c) {
-  std::cout << "ayo" << std::endl;
+  
+  cell **cellDetail;
+  cellDetail = &cellDetails;
+  std::stack<Pair> Path;
+  int row = num_r - 1;
+  int col = num_c - 1;
+  std::cout << "row: " << num_r << " and col: " << num_c << std::endl;
+  Pair next_node = cellDetail[row][col].parent;
+  std::cout << "wehre we breaking" << std::endl;
+  Pair third_node = cellDetail[2][2].parent;
+  std::cout << "(2,2)'s parent: (" << third_node.first << "," << third_node.second << ")" << std::endl;
+  do {
+    Path.push(next_node);
+    row = next_node.first;
+    col = next_node.second;
+  } while (cellDetail[row][col].parent != next_node);
+  
+  Path.push(Pair(row, col));
+  while (!Path.empty()) {
+    Pair p = Path.top();
+    Path.pop();
+    std::cout << "-> (" << p.first << "," << p.second << ") ";
+  }
 }
 
 void aSearchAlgorithm(Grid grid) {
